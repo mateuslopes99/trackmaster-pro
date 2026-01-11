@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="TrackMaster Pro - Sistema Profissional de Rastreamento de Encomendas">
+    <title>TrackMaster Pro - Dashboard</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            min-height: 100vh;
+        }
+        
+        .glass-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(147, 51, 234, 0.1) 100%);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            transition: all 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(59, 130, 246, 0.3);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(59, 130, 246, 0.5);
+        }
+        
+        .pulse-animation {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.5;
+            }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .table-row {
+            transition: all 0.2s ease;
+        }
+        
+        .table-row:hover {
+            background: rgba(59, 130, 246, 0.1);
+            transform: scale(1.01);
+        }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+            border-radius: 10px;
+        }
+        
+        .loading-spinner {
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-top: 3px solid #3b82f6;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="p-6">
+    
+    <!-- Header -->
+    <header class="mb-8 fade-in">
+        <div class="flex items-center justify-between">
+            <div>
+                <h1 class="text-4xl font-bold text-white mb-2">
+                    📦 TrackMaster Pro
+                </h1>
+                <p class="text-gray-400 text-lg">
+                    Sistema Profissional de Rastreamento de Encomendas
+                </p>
+            </div>
+            <div class="flex items-center space-x-4">
+                <div class="glass-card px-4 py-2 rounded-lg">
+                    <span class="text-green-400 text-sm font-semibold flex items-center">
+                        <span class="w-2 h-2 bg-green-400 rounded-full mr-2 pulse-animation"></span>
+                        Sistema Online
+                    </span>
+                </div>
+                <button id="downloadBtn" class="btn-primary text-white px-6 py-3 rounded-lg font-semibold flex items-center space-x-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                    <span>Download Report</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Stats Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 fade-in">
+        <!-- Total de Pedidos -->
+        <div class="stat-card rounded-2xl p-6">
+            <div class="flex items-center justify-between mb-4">
+                <div class="bg-blue-500 bg-opacity-20 p-3 rounded-xl">
+                    <svg class="w-8 h-8 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path>
+                    </svg>
+                </div>
+                <span class="text-blue-400 text-sm font-semibold">+12% este mês</span>
+            </div>
+            <h3 class="text-gray-400 text-sm font-medium mb-1">Total de Pedidos</h3>
+            <p id="totalPedidos" class="text-4xl font-bold text-white">0</p>
+        </div>
+
+        <!-- Em Trânsito -->
+        <div class="stat-card rounded-2xl p-6">
+            <div class="flex items-center justify-between mb-4">
+                <div class="bg-purple-500 bg-opacity-20 p-3 rounded-xl">
+                    <svg class="w-8 h-8 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                    </svg>
+                </div>
+                <span class="text-purple-400 text-sm font-semibold pulse-animation">Ativo</span>
+            </div>
+            <h3 class="text-gray-400 text-sm font-medium mb-1">Em Trânsito</h3>
+            <p id="emTransito" class="text-4xl font-bold text-white">0</p>
+        </div>
+
+        <!-- Entregues -->
+        <div class="stat-card rounded-2xl p-6">
+            <div class="flex items-center justify-between mb-4">
+                <div class="bg-green-500 bg-opacity-20 p-3 rounded-xl">
+                    <svg class="w-8 h-8 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                </div>
+                <span class="text-green-400 text-sm font-semibold">98% taxa</span>
+            </div>
+            <h3 class="text-gray-400 text-sm font-medium mb-1">Entregues</h3>
+            <p id="entregues" class="text-4xl font-bold text-white">0</p>
+        </div>
+    </div>
+
+    <!-- Rastreamento Rápido -->
+    <div class="glass-card rounded-2xl p-6 mb-8 fade-in">
+        <h2 class="text-2xl font-bold text-white mb-4 flex items-center">
+            <svg class="w-6 h-6 mr-2 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+            </svg>
+            Rastreamento Rápido
+        </h2>
+        <div class="flex space-x-4">
+            <input 
+                type="text" 
+                id="trackingInput" 
+                placeholder="Digite o código de rastreamento..."
+                class="flex-1 bg-gray-800 bg-opacity-50 text-white px-6 py-4 rounded-xl border border-gray-700 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+            >
+            <button 
+                id="trackBtn"
+                class="btn-primary text-white px-8 py-4 rounded-xl font-semibold flex items-center space-x-2"
+            >
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                </svg>
+                <span>Rastrear</span>
+            </button>
+        </div>
+        <div id="trackingResult" class="mt-4 hidden"></div>
+    </div>
+
+    <!-- Histórico de Rastreamentos -->
+    <div class="glass-card rounded-2xl p-6 fade-in">
+        <div class="flex items-center justify-between mb-6">
+            <h2 class="text-2xl font-bold text-white flex items-center">
+                <svg class="w-6 h-6 mr-2 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                Histórico de Rastreamentos
+            </h2>
+            <button id="refreshBtn" class="text-blue-400 hover:text-blue-300 transition-colors">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                </svg>
+            </button>
+        </div>
+        
+        <div class="overflow-x-auto">
+            <table class="w-full">
+                <thead>
+                    <tr class="border-b border-gray-700">
+                        <th class="text-left text-gray-400 font-semibold py-3 px-4">Código</th>
+                        <th class="text-left text-gray-400 font-semibold py-3 px-4">Data/Hora</th>
+                        <th class="text-left text-gray-400 font-semibold py-3 px-4">Status</th>
+                        <th class="text-left text-gray-400 font-semibold py-3 px-4">Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="historyTable">
+                    <tr>
+                        <td colspan="4" class="text-center text-gray-500 py-8">
+                            <div class="loading-spinner mx-auto mb-4"></div>
+                            Carregando histórico...
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="mt-8 text-center text-gray-500 text-sm">
+        <p>© 2026 TrackMaster Pro - Sistema Profissional de Rastreamento</p>
+        <p class="mt-2">Desenvolvido para E-commerce & Dropshipping</p>
+    </footer>
+
+    <script>
+        // Configuração
+        const API_BASE = '';
+        
+        // Elementos DOM
+        const totalPedidosEl = document.getElementById('totalPedidos');
+        const emTransitoEl = document.getElementById('emTransito');
+        const entreguesEl = document.getElementById('entregues');
+        const historyTableEl = document.getElementById('historyTable');
+        const trackingInputEl = document.getElementById('trackingInput');
+        const trackBtnEl = document.getElementById('trackBtn');
+        const trackingResultEl = document.getElementById('trackingResult');
+        const refreshBtnEl = document.getElementById('refreshBtn');
+        const downloadBtnEl = document.getElementById('downloadBtn');
+        
+        // Funções de API
+        async function fetchStats() {
+            try {
+                const response = await fetch(`${API_BASE}/api/stats`);
+                const data = await response.json();
+                
+                // Animação de contagem
+                animateValue(totalPedidosEl, 0, data.total_pedidos, 1000);
+                animateValue(emTransitoEl, 0, data.em_transito, 1000);
+                animateValue(entreguesEl, 0, data.entregues, 1000);
+            } catch (error) {
+                console.error('Erro ao buscar estatísticas:', error);
+            }
+        }
+        
+        async function fetchHistory() {
+            try {
+                const response = await fetch(`${API_BASE}/api/history`);
+                const data = await response.json();
+                
+                if (data.length === 0) {
+                    historyTableEl.innerHTML = `
+                        <tr>
+                            <td colspan="4" class="text-center text-gray-500 py-8">
+                                Nenhum rastreamento realizado ainda
+                            </td>
+                        </tr>
+                    `;
+                    return;
+                }
+                
+                historyTableEl.innerHTML = data.map(item => `
+                    <tr class="table-row border-b border-gray-800">
+                        <td class="py-4 px-4">
+                            <code class="bg-gray-800 px-3 py-1 rounded text-blue-400 font-mono text-sm">
+                                ${item.code}
+                            </code>
+                        </td>
+                        <td class="py-4 px-4 text-gray-300">${item.timestamp}</td>
+                        <td class="py-4 px-4">
+                            <span class="px-3 py-1 rounded-full text-xs font-semibold ${getStatusColor(item.status)}">
+                                ${item.status}
+                            </span>
+                        </td>
+                        <td class="py-4 px-4">
+                            <button onclick="viewDetails('${item.code}')" class="text-blue-400 hover:text-blue-300 transition-colors">
+                                Ver detalhes
+                            </button>
+                        </td>
+                    </tr>
+                `).join('');
+            } catch (error) {
+                console.error('Erro ao buscar histórico:', error);
+                historyTableEl.innerHTML = `
+                    <tr>
+                        <td colspan="4" class="text-center text-red-400 py-8">
+                            Erro ao carregar histórico
+                        </td>
+                    </tr>
+                `;
+            }
+        }
+        
+        async function trackPackage() {
+            const code = trackingInputEl.value.trim();
+            
+            if (!code) {
+                showNotification('Por favor, digite um código de rastreamento', 'error');
+                return;
+            }
+            
+            trackBtnEl.disabled = true;
+            trackBtnEl.innerHTML = '<div class="loading-spinner mx-auto"></div>';
+            
+            try {
+                const response = await fetch(`${API_BASE}/api/track`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ code })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showNotification('Rastreamento realizado com sucesso!', 'success');
+                    trackingInputEl.value = '';
+                    fetchStats();
+                    fetchHistory();
+                } else {
+                    showNotification(data.error || 'Erro ao rastrear', 'error');
+                }
+            } catch (error) {
+                showNotification('Erro ao conectar com o servidor', 'error');
+            } finally {
+                trackBtnEl.disabled = false;
+                trackBtnEl.innerHTML = `
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                    </svg>
+                    <span>Rastrear</span>
+                `;
+            }
+        }
+        
+        // Funções auxiliares
+        function animateValue(element, start, end, duration) {
+            const range = end - start;
+            const increment = range / (duration / 16);
+            let current = start;
+            
+            const timer = setInterval(() => {
+                current += increment;
+                if ((increment > 0 && current >= end) || (increment < 0 && current <= end)) {
+                    current = end;
+                    clearInterval(timer);
+                }
+                element.textContent = Math.floor(current);
+            }, 16);
+        }
+        
+        function getStatusColor(status) {
+            const statusLower = status.toLowerCase();
+            if (statusLower.includes('entregue')) return 'bg-green-500 bg-opacity-20 text-green-400';
+            if (statusLower.includes('trânsito') || statusLower.includes('postado')) return 'bg-blue-500 bg-opacity-20 text-blue-400';
+            if (statusLower.includes('erro')) return 'bg-red-500 bg-opacity-20 text-red-400';
+            return 'bg-gray-500 bg-opacity-20 text-gray-400';
+        }
+        
+        function showNotification(message, type) {
+            const notification = document.createElement('div');
+            notification.className = `fixed top-4 right-4 px-6 py-4 rounded-xl shadow-lg z-50 fade-in ${
+                type === 'success' ? 'bg-green-500' : 'bg-red-500'
+            }`;
+            notification.innerHTML = `
+                <p class="text-white font-semibold">${message}</p>
+            `;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+        
+        function viewDetails(code) {
+            showNotification(`Visualizando detalhes de ${code}`, 'success');
+        }
+        
+        // Event Listeners
+        trackBtnEl.addEventListener('click', trackPackage);
+        trackingInputEl.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') trackPackage();
+        });
+        refreshBtnEl.addEventListener('click', () => {
+            fetchStats();
+            fetchHistory();
+            showNotification('Dados atualizados!', 'success');
+        });
+        downloadBtnEl.addEventListener('click', () => {
+            showNotification('Gerando relatório... (Funcionalidade em desenvolvimento)', 'success');
+        });
+        
+        // Inicialização
+        fetchStats();
+        fetchHistory();
+        
+        // Auto-refresh a cada 30 segundos
+        setInterval(() => {
+            fetchStats();
+            fetchHistory();
+        }, 30000);
+    </script>
+</body>
+</html>
