@@ -187,100 +187,25 @@ Desenvolvido para E-commerce & Dropshipping
             # Envia mensagem de processamento
             TelegramBot.send_message(chat_id, "🔍 <b>Rastreando encomenda...</b>")
             
-            # Rastreia o pacote
-            result = LinketrackAPI.track_package(text)
-            
-            # Formata e envia o resultado
-            card = TelegramBot.format_tracking_card(result)
-            TelegramBot.send_message(chat_id, card)
-
-
-def telegram_bot_polling():
-    """Loop de polling do bot do Telegram"""
-    global bot_offset
-    
-    print("🤖 Bot do Telegram iniciado!")
-    
-    while True:
-        try:
-            updates = TelegramBot.get_updates(bot_offset)
-            
-            if updates and updates.get('ok'):
-                for update in updates.get('result', []):
-                    bot_offset = update['update_id'] + 1
-                    
-                    if 'message' in update:
-                        TelegramBot.process_message(update['message'])
-        
-        except Exception as e:
-            print(f"Erro no bot: {e}")
-
-
-# ============================================================================
-# ROTAS DO FLASK
+            # ============================================================================
+# INICIALIZAÇÃO - AJUSTADA PARA RENDER/GUNICORN
 # ============================================================================
 
-@app.route('/')
-def index():
-    """Rota principal - Dashboard"""
-    return render_template('index.html')
-
-
-@app.route('/api/stats')
-def get_stats():
-    """Retorna estatísticas do sistema"""
-    total_pedidos = len(tracking_history)
-    
-    # Conta pedidos em trânsito (simplificado)
-    em_transito = sum(1 for item in tracking_history 
-                      if 'trânsito' in item.get('status', '').lower() 
-                      or 'postado' in item.get('status', '').lower())
-    
-    return jsonify({
-        'total_pedidos': total_pedidos,
-        'em_transito': em_transito,
-        'entregues': total_pedidos - em_transito
-    })
-
-
-@app.route('/api/history')
-def get_history():
-    """Retorna histórico de rastreamentos"""
-    # Retorna os últimos 50 registros
-    return jsonify(tracking_history[-50:][::-1])
-
-
-@app.route('/api/track', methods=['POST'])
-def track_package():
-    """Endpoint para rastrear pacote via Dashboard"""
-    data = request.get_json()
-    tracking_code = data.get('code', '')
-    
-    if not tracking_code:
-        return jsonify({'success': False, 'error': 'Código não fornecido'})
-    
-    result = LinketrackAPI.track_package(tracking_code)
-    return jsonify(result)
-
-
-# ============================================================================
-# INICIALIZAÇÃO
-# ============================================================================
-
-if __name__ == '__main__':
-    print("=" * 60)
-    print("🚀 TrackMaster Pro - Sistema de Rastreamento")
-    print("=" * 60)
-    print(f"📊 Dashboard: http://localhost:5000")
-    print(f"🤖 Bot Telegram: {'Configurado' if TELEGRAM_TOKEN != 'COLE_SEU_TOKEN_AQUI' else 'AGUARDANDO TOKEN'}")
-    print("=" * 60)
-    
-    # Inicia o bot do Telegram em uma thread separada
+# Função para iniciar o bot de forma segura
+def start_bot():
     if TELEGRAM_TOKEN != 'COLE_SEU_TOKEN_AQUI':
+        # daemon=True garante que o bot morra se o app principal parar
         bot_thread = threading.Thread(target=telegram_bot_polling, daemon=True)
         bot_thread.start()
+        print("✅ Thread do Bot iniciada com sucesso!")
     else:
-        print("⚠️  AVISO: Configure o TELEGRAM_TOKEN para ativar o bot!")
-    
-    # Inicia o servidor Flask
+        print("⚠️ AVISO: Configure o TELEGRAM_TOKEN para ativar o bot!")
+
+# CHAMADA DIRETA (Fora do if __name__ == '__main__')
+# Isso garante que o Gunicorn execute o bot ao subir o site
+start_bot()
+
+if __name__ == '__main__':
+    # Isso só roda no seu computador (localhost)
+    print("🚀 Iniciando em modo de desenvolvimento...")
     app.run(debug=True, host='0.0.0.0', port=5000, use_reloader=False)
