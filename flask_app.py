@@ -14,7 +14,7 @@ import os
 # ============================================================================
 # CONFIGURAÇÕES
 # ============================================================================
-TELEGRAM_TOKEN = '8324151299:AAGz29_MZRbv6R-kZJQAschx3AObKrN_2uU'
+TELEGRAM_TOKEN = os.getenv('TELEGRAM_TOKEN')
 LINKETRACK_USER = 'teste'
 LINKETRACK_TOKEN = '1abcd02b11568202244439c33602d338b15d6560'
 
