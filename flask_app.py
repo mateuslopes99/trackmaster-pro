@@ -192,6 +192,24 @@ Desenvolvido para E-commerce & Dropshipping
 # ============================================================================
 
 # Função para iniciar o bot de forma segura
+def telegram_bot_polling():
+    """Loop de polling do bot do Telegram"""
+    global bot_offset
+    print("🤖 Bot do Telegram iniciado!")
+    
+    while True:
+        try:
+            # Esta parte usa a lógica que você já tinha criado
+            updates = TelegramBot.get_updates(bot_offset)
+            
+            if updates and updates.get('ok'):
+                for update in updates.get('result', []):
+                    bot_offset = update['update_id'] + 1
+                    if 'message' in update:
+                        TelegramBot.process_message(update['message'])
+        
+        except Exception as e:
+            print(f"Erro no bot: {e}")
 def start_bot():
     if TELEGRAM_TOKEN != 'COLE_SEU_TOKEN_AQUI':
         # daemon=True garante que o bot morra se o app principal parar
